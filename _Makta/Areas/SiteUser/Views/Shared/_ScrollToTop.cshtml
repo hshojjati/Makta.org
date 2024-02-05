@@ -1,0 +1,118 @@
+﻿
+<style>
+    @@media screen and (min-width: 780px) {
+        .sticky-header {
+            top: 48px;
+        }
+    }
+
+    @@media screen and (max-width: 780px) {
+        .sticky-header {
+            top: 74px;
+        }
+    }
+
+    .sticky-header {
+        position: sticky;
+        z-index: 5;
+    }
+
+    html:not([data-scroll='0']) .scroll-show {
+        display: block !important;
+    }
+
+    .scroll-show {
+        display: none;
+    }
+
+    html:not([data-scroll='0']) .scroll-no-show {
+        display: none;
+    }
+
+    .scroll-no-show {
+        display: block;
+    }
+
+
+    html:not([data-scroll='0']) .scroll-to-top {
+        bottom: 25px;
+    }
+
+    .scroll-to-top {
+        display: flex;
+        justify-content: center;
+        position: fixed;
+        bottom: -50px;
+        z-index: 5;
+        width: 100%;
+        @*margin: 0 -15px;*@
+        transition: 0.4s;
+        pointer-events: none;
+    }
+
+        .scroll-to-top button {
+            border-radius: 100%;
+            background-color: #0CABE2;
+            height: 30px;
+            width: 30px;
+            outline: none;
+            border: 1px solid #097094;
+            cursor: pointer;
+            pointer-events: initial;
+            -webkit-box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.5);
+            -moz-box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.5);
+            box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.5);
+        }
+
+            .scroll-to-top button img {
+                transform: rotate(-90deg);
+            }
+
+    html {
+        scroll-behavior: smooth;
+    }
+</style>
+
+<div class="scroll-to-top">
+    <button onclick="window.scrollTo(0, 0)"><img src="~/img/Public/arrow.png" style="width: 15px; height: 15px; z-index: 10" /></button>
+</div>
+
+<script>
+    // The debounce function receives our function as a parameter
+    const debounce = (fn) => {
+
+        // This holds the requestAnimationFrame reference, so we can cancel it if we wish
+        let frame;
+
+        // The debounce function returns a new function that can receive a variable number of arguments
+        return (...params) => {
+
+            // If the frame variable has been defined, clear it now, and queue for next frame
+            if (frame) {
+                cancelAnimationFrame(frame);
+            }
+
+            // Queue our function call for the next frame
+            frame = requestAnimationFrame(() => {
+
+                // Call our function and pass any params we received
+                fn(...params);
+            });
+
+        }
+    };
+
+
+    // Reads out the scroll position and stores it in the data attribute
+    // so we can use it in our stylesheets
+    const storeScroll = () => {
+        var scroll = window.scrollY < 50 ? 0 : window.scrollY;
+        document.documentElement.dataset.scroll = scroll;//window.scrollY;
+    }
+
+    // Listen for new scroll events, here we debounce our `storeScroll` function
+    document.addEventListener('scroll', debounce(storeScroll), { passive: true });
+
+    // Update scroll position for first time
+    storeScroll();
+</script>

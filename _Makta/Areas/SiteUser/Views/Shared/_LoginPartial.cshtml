@@ -1,0 +1,34 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims;
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+
+<ul class="nav navbar-nav float-xs-right">
+    <li class="dropdown dropdown-user nav-item">
+        @if (SignInManager.IsSignedIn(User))
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = UserManager.Users.First(p => p.Id == userId);
+
+            <a href="#" data-toggle="dropdown" class="dropdown-toggle nav-link dropdown-user-link">
+                <span class="avatar avatar-online">
+                    <img src="@(FileUtility.GetPublicUrl(user.Avatar) ?? "/defaultUserAvatar.png")" alt=""><i></i>
+                </span>
+                <span class="user-name">&nbsp;@user.FirstName</span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right">
+                <a asp-area="Identity" asp-page="/Account/Manage/Index" class="dropdown-item"><i class="icon-head"></i> Edit Profile</a>
+                <div class="dropdown-divider"></div>
+                <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                    <button type="submit" class="dropdown-item"><i class="icon-power3"></i>Logout</button>
+                </form>
+            </div>
+        }
+        else
+        {
+            <a asp-area="Identity" asp-page="/Account/Login" class="nav-link dropdown-user-link">Login</a>
+        }
+    </li>
+</ul>
