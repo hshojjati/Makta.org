@@ -31,7 +31,7 @@ namespace Makta.Areas.SitePublic.Controllers
         {
             var _settings = await _settingRepository.TableNoTracking.FirstOrDefaultAsync(cancellationToken);
             ViewData["_settings"] = _settings;
-            return View();
+            return View("ComingSoon");
         }
 
         public IActionResult Privacy()
