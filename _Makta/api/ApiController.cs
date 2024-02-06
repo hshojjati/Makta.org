@@ -396,5 +396,52 @@ namespace Makta.api
                 });
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCountryCodes([FromBody] StoreKeyDto data, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (data == null)
+                    return BadRequest(new ApiResult
+                    {
+                        ResultMessage = "Invalid data"
+                    });
+
+                if (string.IsNullOrEmpty(data.StoreKey))
+                    return Unauthorized(new ApiResult
+                    {
+                        ResultMessage = "Invalid store key"
+                    });
+
+                var store = await _storeRepository.TableNoTracking.FirstOrDefaultAsync(p => p.StoreKey.ToLower() == data.StoreKey.ToLower(), cancellationToken);
+
+                if (store == null)
+                    return Unauthorized(new ApiResult
+                    {
+                        ResultMessage = "Invalid store key"
+                    });
+
+                if (!store.IsActive)
+                    return BadRequest(new ApiResult
+                    {
+                        ResultMessage = "Inactive store"
+                    });
+
+                var countryList = await _countryRepository.TableNoTracking.ToListAsync(cancellationToken);
+
+                return Ok(new ApiResult
+                {
+                    ResultBody = countryList
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ApiResult
+                {
+                    ResultMessage = ex.Message
+                });
+            }
+        }
     }
 }
