@@ -3,7 +3,19 @@
     public class AddPointsDto
     {
         public string StoreKey { get; set; }
-        public string Currency { get; set; } = "CAD";
+
+        public string currency;
+        public string Currency
+        {
+            get
+            {
+                return string.IsNullOrEmpty(currency) ? "CAD" : currency;
+            }
+            set
+            {
+                currency = value;
+            }
+        }
         public string CountryCode { get; set; }
         public string PhoneNumber { get; set; }
         public decimal AmountSpent { get; set; }
