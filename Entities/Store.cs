@@ -9,9 +9,11 @@ namespace Entities
         public string StoreName { get; set; }
         public string StoreKey { get; set; }
         public bool IsActive { get; set; }
+        public string OwnerId { get; set; }
 
         // Navigation Properties
         public virtual ApplicationUser Partner { get; set; }
+        public virtual ApplicationUser Owner { get; set; }
     }
 
     public class StoreConfig : IEntityTypeConfiguration<Store>

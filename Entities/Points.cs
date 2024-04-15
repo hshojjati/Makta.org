@@ -9,14 +9,12 @@ namespace Entities
         public int StoreId { get; set; }
         public string ClientId { get; set; }
         public decimal SpentAmount { get; set; }
-        public int CurrencyId { get; set; }
         public double EarnedPoints { get; set; }
-        public int PointRateId { get; set; }
+        public int RateId { get; set; }
         public DateTime InsertDateTime { get; set; }
         public string Comments { get; set; }
 
-        // Navigation Properties
-        public virtual Currency Currency { get; set; }
+        public virtual Rate Rate { get; set; }
     }
 
     public class PointConfig : IEntityTypeConfiguration<Points>

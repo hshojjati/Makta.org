@@ -4,7 +4,7 @@ using System;
 
 namespace Entities
 {
-    public class PointRate : BaseEntity
+    public class Rate : BaseEntity
     {
         public int CurrencyId { get; set; }
         public decimal SpentAmount { get; set; }
@@ -15,9 +15,9 @@ namespace Entities
         public virtual Currency Currency { get; set; }
     }
 
-    public class PointRateConfig : IEntityTypeConfiguration<PointRate>
+    public class RateConfig : IEntityTypeConfiguration<Rate>
     {
-        public void Configure(EntityTypeBuilder<PointRate> builder)
+        public void Configure(EntityTypeBuilder<Rate> builder)
         {
             builder.Property(p => p.SpentAmount).HasColumnType("Decimal(18,2)").IsRequired();
             builder.Property(p => p.InsertDateTime).HasDefaultValueSql("GETUTCDATE()");

@@ -221,7 +221,7 @@ namespace Data
                 , new Currency { Name = "ZAR", FullName = "Rand" }
                 , new Currency { Name = "ZMK", FullName = "Zambian Kwacha" }
                 , new Currency { Name = "ZWD", FullName = "Zimbabwe Dollar" } };
-            currencies = currencies.OrderBy(p => p.Name).ToList(); //to make sure CAD is always getting Id of 26 for seeding the first PointRate
+            currencies = currencies.OrderBy(p => p.Name).ToList(); //to make sure CAD is always getting Id of 26 for seeding the first Rate
             dbContext.AddRange(currencies);
             #endregion
 
@@ -264,8 +264,8 @@ namespace Data
             dbContext.UserRoles.Add(userRoleAdmin);
             #endregion
 
-            #region PointRate
-            var cadPoints = new PointRate
+            #region Rate
+            var cadPoints = new Rate
             {
                 CurrencyId = 26, //CAD
                 Points = 30,

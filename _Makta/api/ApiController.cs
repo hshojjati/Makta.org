@@ -25,11 +25,11 @@ namespace Makta.api
         private readonly IRepository<Country> _countryRepository;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IRepository<Currency> _currencyRepository;
-        private readonly IRepository<PointRate> _pointRateRepository;
+        private readonly IRepository<Rate> _rateRepository;
         private readonly IRepository<Points> _pointsRepository;
         private readonly IEmailSender _emailSender;
 
-        public ApiController(IApiService apiService, IRepository<Store> storeRepository, IRepository<ApplicationUser> userRepository, IRepository<Country> countryRepository, UserManager<ApplicationUser> userManager, IRepository<Currency> currencyRepository, IRepository<PointRate> pointRateRepository, IRepository<Points> pointsRepository, IEmailSender emailSender)
+        public ApiController(IApiService apiService, IRepository<Store> storeRepository, IRepository<ApplicationUser> userRepository, IRepository<Country> countryRepository, UserManager<ApplicationUser> userManager, IRepository<Currency> currencyRepository, IRepository<Rate> rateRepository, IRepository<Points> pointsRepository, IEmailSender emailSender)
         {
             _apiService = apiService;
             _storeRepository = storeRepository;
@@ -37,7 +37,7 @@ namespace Makta.api
             _countryRepository = countryRepository;
             _userManager = userManager;
             _currencyRepository = currencyRepository;
-            _pointRateRepository = pointRateRepository;
+            _rateRepository = rateRepository;
             _pointsRepository = pointsRepository;
             _emailSender = emailSender;
         }
@@ -117,8 +117,8 @@ namespace Makta.api
                         ResultMessage = "Invalid currency"
                     });
 
-                var pointRate = await _pointRateRepository.TableNoTracking.FirstOrDefaultAsync(p => p.CurrencyId == currency.Id, cancellationToken);
-                if (pointRate == null)
+                var rate = await _rateRepository.TableNoTracking.FirstOrDefaultAsync(p => p.CurrencyId == currency.Id, cancellationToken);
+                if (rate == null)
                     return BadRequest(new ApiResult
                     {
                         ResultMessage = "Invalid points rate"
@@ -175,16 +175,15 @@ namespace Makta.api
 
                 //adding points
 
-                var earnedPoints = Math.Round((double)data.AmountSpent / (double)pointRate.SpentAmount * pointRate.Points);
+                var earnedPoints = Math.Round((double)data.AmountSpent / (double)rate.SpentAmount * rate.Points);
 
                 var points = new Points
                 {
                     ClientId = client.Id,
                     Comments = data.Comments,
-                    CurrencyId = currency.Id,
                     SpentAmount = data.AmountSpent,
                     StoreId = store.Id,
-                    PointRateId = pointRate.Id,
+                    RateId = rate.Id,
                     EarnedPoints = earnedPoints
                 };
 
@@ -365,7 +364,7 @@ namespace Makta.api
                 var totalPoints = await _pointsRepository.TableNoTracking.Where(p => p.ClientId == client.Id).SumAsync(p => p.EarnedPoints, cancellationToken);
 
                 var pointsList = await _pointsRepository.TableNoTracking
-                    .Include(p => p.Currency)
+                    .Include(p => p.Rate).ThenInclude(p=>p.Currency)
                     .OrderByDescending(p => p.InsertDateTime)
                     .Where(p => p.ClientId == client.Id && p.StoreId == store.Id)
                     .Skip(data.ItemsPerPage * (data.PageNumber - 1))
@@ -373,7 +372,7 @@ namespace Makta.api
                     .Select(p => new
                     {
                         DateTime = p.InsertDateTime.ToString("yyyy-MM-dd"),
-                        SpentAmount = $"{p.SpentAmount} {p.Currency.Name}",
+                        SpentAmount = $"{p.SpentAmount} {p.Rate.Currency.Name}",
                         p.EarnedPoints,
                         p.Comments
                     })
