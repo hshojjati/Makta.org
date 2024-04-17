@@ -14,6 +14,9 @@ namespace Entities
         public string Telegram { get; set; }
         public string GitHub { get; set; }
         public string Instagram { get; set; }
+        public string WhitePaper { get; set; }
+        public string Explorer { get; set; }
+        public string Forum { get; set; }
     }
 
     public class SettingConfig : IEntityTypeConfiguration<Setting>

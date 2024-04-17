@@ -31,7 +31,10 @@ namespace Data
                 GitHub = "https://github.com/makta-org",
                 Linkedin = "https://www.linkedin.com/in/makta",
                 Telegram = "https://t.me/+pCbsfL72sxowNjgx",
-                Twitter = ""
+                Twitter = "",
+                Explorer = "https://explorer.makta.org",
+                Forum = "https://talk.makta.org",
+                WhitePaper = "https://makta.org/whitepaper.pdf"
             });
             #endregion
 

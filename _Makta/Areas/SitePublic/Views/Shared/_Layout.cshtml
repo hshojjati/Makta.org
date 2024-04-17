@@ -50,10 +50,10 @@
             <nav id="navbar" class="navbar">
                 <ul>
                     <li><a class="nav-link scrollto" href="~/home/Index">Home</a></li>
-                    <li><a class="nav-link scrollto" href="https://explorer.makta.org/" target="_blank">Explorer</a></li>
-                    <li><a class="nav-link scrollto" href="https://makta.org/whitepaper.pdf">Technology</a></li>
+                    <li><a class="nav-link scrollto" href="@ViewBag._settings.Explorer" target="_blank">Explorer</a></li>
+                    <li><a class="nav-link scrollto" href="@ViewBag._settings.WhitePaper">Technology</a></li>
                     <li><a class="nav-link scrollto" href="https://github.com/makta-org" target="_blank">Source Code</a></li>
-                    <li><a class="nav-link scrollto" href="https://talk.makta.net/" target="_blank">Community</a></li>
+                    <li><a class="nav-link scrollto" href="@ViewBag._settings.Forum" target="_blank">Community</a></li>
                 </ul>
                 <i class="bi bi-list mobile-nav-toggle d-none"></i>
             </nav><!-- .navbar -->
@@ -80,15 +80,15 @@
                     <div class="col-lg-2 col-md-6 footer-links">
                         <h4>Technology</h4>
                         <ul>
-                            <li><i class="bi bi-chevron-right"></i> <a href="https://makta.org/whitepaper.pdf">White Paper</a></li>
-                            <li><i class="bi bi-chevron-right"></i> <a href="https://explorer.makta.org/" target="_blank">Explorer</a></li>
+                            <li><i class="bi bi-chevron-right"></i> <a href="@ViewBag._settings.WhitePaper">White Paper</a></li>
+                            <li><i class="bi bi-chevron-right"></i> <a href="@ViewBag._settings.Explorer" target="_blank">Explorer</a></li>
                         </ul>
                     </div>
 
                     <div class="col-lg-3 col-md-6 footer-links">
                         <h4>Community</h4>
                         <ul>
-                            <li><i class="bi bi-chevron-right"></i> <a href="https://talk.makta.net/" target="_blank">Forum</a></li>
+                            <li><i class="bi bi-chevron-right"></i> <a href="@ViewBag._settings.Forum" target="_blank">Forum</a></li>
                             <li><i class="bi bi-chevron-right"></i> <a href="mailto:community@makta.org"><strong>Email:</strong> community@makta.org</a></li>
                         </ul>
                     </div>
