@@ -78,7 +78,7 @@ builder.Services.AddSignalR();
 
 builder.Services.AddRazorPages();
 
-builder.Services.AddSingleton(_siteSetting.EmailSettingList);
+builder.Services.AddSingleton(_siteSetting.EmailSetting);
 
 builder.Services.AddSingleton(_siteSetting.CommonSetting);
 

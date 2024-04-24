@@ -17,19 +17,15 @@ namespace Services.Email
 {
     public class EmailSender : IEmailSender
     {
-        private readonly List<EmailSetting> _emailSettings;
-        private readonly CommonSetting _commonSettings;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly EmailSetting _emailSetting;
         private const string BaseFullLogPath = "wwwroot\\Logs";
         private readonly SMSSetting _smsSettings;
         private readonly IRepository<Setting> _settingRepository;
         private readonly Setting _settings;
 
-        public EmailSender(List<EmailSetting> emailSettings, CommonSetting commonSettings, SMSSetting smsSettings, IHttpContextAccessor httpContextAccessor, IRepository<Setting> settingRepository)
+        public EmailSender(EmailSetting emailSetting, SMSSetting smsSettings, IRepository<Setting> settingRepository)
         {
-            _commonSettings = commonSettings;
-            _emailSettings = emailSettings;
-            _httpContextAccessor = httpContextAccessor;
+            _emailSetting = emailSetting;
             _smsSettings = smsSettings;
 
             if (!Directory.Exists(BaseFullLogPath))
@@ -41,10 +37,11 @@ namespace Services.Email
             _settings = _settingRepository.TableNoTracking.FirstOrDefault();
         }
 
-        public async Task SendEmail(EmailSetting email, EmailMessage message)
+        private async Task SendEmail(EmailMessage message)
         {
+            message.From = new MailboxAddress(_emailSetting.FromName, _emailSetting.FromEmail);
             var emailMessage = CreateEmailMessage(message);
-            await Send(email, emailMessage);
+            await Send(emailMessage);
             //await Log(emailMessage);
         }
 
@@ -66,7 +63,7 @@ namespace Services.Email
             return emailMessage;
         }
 
-        private async Task Send(EmailSetting email, MimeMessage mailMessage)
+        private async Task Send(MimeMessage mailMessage)
         {
             using var client = new SmtpClient();
             try
@@ -74,9 +71,9 @@ namespace Services.Email
                 client.ServerCertificateValidationCallback = (s, c, h, e) => true;
                 client.CheckCertificateRevocation = false;
 
-                await client.ConnectAsync(email.SmtpServer, email.Port, SecureSocketOptions.Auto);
+                await client.ConnectAsync(_emailSetting.SmtpServer, _emailSetting.Port, SecureSocketOptions.Auto);
                 client.AuthenticationMechanisms.Remove("XOAUTH2");
-                await client.AuthenticateAsync(email.UserName, email.Password);
+                await client.AuthenticateAsync(_emailSetting.UserName, _emailSetting.Password);
                 await client.SendAsync(mailMessage);
 
                 var fromaddress = mailMessage.From[0] as MailboxAddress;
@@ -106,8 +103,6 @@ namespace Services.Email
         {
             try
             {
-                EmailSetting email = _emailSettings.Where(p => p.SettingName == "Community").FirstOrDefault();
-
                 MailboxAddress from = new MailboxAddress(contactUs.SenderName, contactUs.SenderEmail);
 
                 string subject = "You have a Contact-Us Message (safe!!)";
@@ -126,9 +121,9 @@ namespace Services.Email
                 body += $"<br>Phone: <b>{contactUs.SenderPhone}</b>";
                 body += $"<br>Message: <b>{contactUs.Message}</b>";
 
-                EmailMessage message = new EmailMessage(from, toAddresses, subject, body);
+                EmailMessage message = new EmailMessage(toAddresses, subject, body);
 
-                await SendEmail(email, message);
+                await SendEmail(message);
 
             }
             catch (Exception)
@@ -141,17 +136,13 @@ namespace Services.Email
         {
             try
             {
-                EmailSetting email = _emailSettings.Where(p => p.SettingName == "Admin").FirstOrDefault();
-
-                MailboxAddress from = new MailboxAddress(email.FromName, email.FromEmail);
-
                 string subject = "Forgot Password";
 
                 string body = @"Dear " + user.FirstName +
                     @",<br>Please reset your password by <a href = '" + returnUrl + "' > clicking here </a>.";
 
-                EmailMessage message = new EmailMessage(from, new List<MailboxAddress> { new MailboxAddress(user.Email) }, subject, body);
-                await SendEmail(email, message);
+                EmailMessage message = new EmailMessage(new List<MailboxAddress> { new MailboxAddress(user.Email) }, subject, body);
+                await SendEmail(message);
             }
             catch (Exception)
             {
@@ -163,13 +154,9 @@ namespace Services.Email
         {
             try
             {
-                EmailSetting email = _emailSettings.Where(p => p.SettingName == "Admin").FirstOrDefault();
+                EmailMessage message = new EmailMessage(new List<MailboxAddress> { new MailboxAddress(user.Email) }, subject, content);
 
-                MailboxAddress from = new MailboxAddress(email.FromName, email.FromEmail);
-
-                EmailMessage message = new EmailMessage(from, new List<MailboxAddress> { new MailboxAddress(user.Email) }, subject, content);
-
-                await SendEmail(email, message);
+                await SendEmail(message);
             }
             catch (Exception)
             {
@@ -206,7 +193,7 @@ namespace Services.Email
             File.AppendAllText(BaseFullLogPath + "\\Emaillog.txt", DateTime.UtcNow.ToString("yyyy-MM-dd hh:mm:ss") + " - " + logMessage + Environment.NewLine);
         }
 
-        public async Task SendSMS(string DestinatonNumber, string body)
+        private async Task SendSMS(string DestinatonNumber, string body)
         {
             try
             {
@@ -254,8 +241,6 @@ namespace Services.Email
         {
             try
             {
-                EmailSetting email = _emailSettings.Where(p => p.SettingName == "Community").FirstOrDefault();
-                MailboxAddress from = new MailboxAddress(email.FromName, email.FromEmail);
                 string subject = $"No-Reply -- Verification code";
                 string body = "";
                 body += $"Verification code: {code}";
@@ -272,14 +257,13 @@ namespace Services.Email
                     };
 
                     var emailMessage = new MimeMessage();
-                    emailMessage.From.Add(from);
                     emailMessage.To.Add(item);
                     emailMessage.Subject = subject;
 
                     emailMessage.Body = bodyBuilder.ToMessageBody();
 
                     //send the email
-                    Send(email, emailMessage);
+                    Send(emailMessage);
                 }
 
             }
@@ -300,10 +284,6 @@ namespace Services.Email
                     return;
                 }
 
-                EmailSetting emailSetting = _emailSettings.Where(p => p.SettingName == "Community").FirstOrDefault();
-
-                MailboxAddress from = new MailboxAddress(emailSetting.FromName, emailSetting.FromEmail);
-
                 string subject = "New Makta subscriber";
 
                 MailboxAddress to1 = new MailboxAddress($"{_settings.CommunityName} Community", _settings.CommunityEmail);
@@ -319,9 +299,9 @@ namespace Services.Email
                 body += $"<br>Email: <b>{email}</b>";
                 body += $"<br><br>{_settings.CommunityName} Auto e-Mailing System";
 
-                EmailMessage message = new EmailMessage(from, toAddresses, subject, body);
+                EmailMessage message = new EmailMessage(toAddresses, subject, body);
 
-                await SendEmail(emailSetting, message);
+                await SendEmail(message);
 
             }
             catch (Exception)
@@ -340,9 +320,7 @@ namespace Services.Email
                     return;
                 }
 
-                EmailSetting emailSetting = _emailSettings.Where(p => p.SettingName == "Community").FirstOrDefault();
 
-                MailboxAddress from = new MailboxAddress(emailSetting.FromName, emailSetting.FromEmail);
 
                 string subject = "New Makta Contributer";
 
@@ -359,9 +337,9 @@ namespace Services.Email
                 bodyText += $"<br>Info: <b>{body}</b>";
                 bodyText += $"<br><br>{_settings.CommunityName} Auto e-Mailing System";
 
-                EmailMessage message = new EmailMessage(from, toAddresses, subject, bodyText);
+                EmailMessage message = new EmailMessage(toAddresses, subject, bodyText);
 
-                await SendEmail(emailSetting, message);
+                await SendEmail(message);
 
             }
             catch (Exception)

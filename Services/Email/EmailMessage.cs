@@ -10,10 +10,8 @@ namespace Services.Email
         public string Subject { get; set; }
         public string Content { get; set; }
 
-        public EmailMessage(MailboxAddress from, IEnumerable<MailboxAddress> to, string subject, string content)
+        public EmailMessage(IEnumerable<MailboxAddress> to, string subject, string content)
         {
-            From = from;
-
             To = new List<MailboxAddress>();
             To.AddRange(to);
 

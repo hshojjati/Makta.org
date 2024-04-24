@@ -5,7 +5,7 @@ namespace Common
     public class SiteSettings
     {
         public CommonSetting CommonSetting { get; set; }
-        public List<EmailSetting> EmailSettingList { get; set; }
+        public EmailSetting EmailSetting { get; set; }
         public IdentitySetting IdentitySetting { get; set; }
         public SMSSetting SMSSetting { get; set; }
     }

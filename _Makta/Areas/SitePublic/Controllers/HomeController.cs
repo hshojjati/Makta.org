@@ -49,8 +49,10 @@ namespace Makta.Areas.SitePublic.Controllers
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        public async Task<IActionResult> Error(CancellationToken cancellationToken)
         {
+            var _settings = await _settingRepository.TableNoTracking.FirstOrDefaultAsync(cancellationToken);
+            ViewData["_settings"] = _settings;
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
@@ -74,8 +76,10 @@ namespace Makta.Areas.SitePublic.Controllers
             }
         }
 
-        public IActionResult joinus()
+        public async Task<IActionResult> joinus(CancellationToken cancellationToken)
         {
+            var _settings = await _settingRepository.TableNoTracking.FirstOrDefaultAsync(cancellationToken);
+            ViewData["_settings"] = _settings;
             return View();
         }
 
@@ -94,10 +98,10 @@ namespace Makta.Areas.SitePublic.Controllers
                 if (!StringHelper.IsEmailValid(model.Email))
                     return new JsonResult(new ReturnClass { Description = "Please enter a valid email address.", IsSucceed = false, ButtonText = "ok let me check!" });
 
-                _emailSender.SendSubscribeEmailtoAdmin(data);
-
                 _emailSender.SaveSubscribeData($"joinus - {data}");
-                return new JsonResult(new ReturnClass { Description = "Thanks for being a part of Makta community. A community member will process your request and will contact you no more than 2 business days.", IsSucceed = true, ButtonText = "Cool, thanks!" });
+
+                _emailSender.SendSubscribeEmailtoAdmin(data);
+                return new JsonResult(new ReturnClass { Description = "Thanks for being a part of Makta community. A community member will be in touch with you.", IsSucceed = true, ButtonText = "Cool, thanks!" });
             }
             catch (Exception ex)
             {

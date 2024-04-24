@@ -37,21 +37,14 @@
 
                                 <div class="form-group">
                                     <p>Name: <span class="required">*</span></p>
-                                    <input type="text" id="joinusname" name="joinusname" class="form-control" placeholder="ex: Makta" required>
+                                    <input type="text" id="joinusname" name="joinusname" class="form-control" required>
 
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="form-group mt-3 mt-md-0">
                                     <p>E-mail: <span class="required">*</span></p>
-                                    <input type="email" class="form-control" name="joinusemail" id="joinusemail" placeholder="ex: youremail@makta.com" required>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="form-group">
-                                    <p>Phone: <span class="required">*</span></p>
-                                    <input type="text" class="form-control" name="joinusphon" id="joinusphone" placeholder="ex: 2261236789" required>
+                                    <input type="email" class="form-control" name="joinusemail" id="joinusemail" required>
                                 </div>
                             </div>
 
@@ -66,25 +59,17 @@
 
 
                                 <div class="col-md-6  form-group mt-3 mt-md-0">
-                                    <p>Role:</p>
+                                    <p>Interested area:</p>
                                     <select name="joinusrole" id="joinusrole">
-                                        <option value="NA" disabled selected>Select your role</option>
-                                        <option value="softwaredeveloper">Software Developer</option>
+                                        <option value="softwaredeveloper" selected>Software Developer</option>
                                         <option value="Designer">Designer</option>
                                         <option value="UI/UX">UI/UX</option>
                                         <option value="SoftwareQA&Tester">Software QA & Tester</option>
                                         <option value="ProjectManager">Project Manager</option>
                                         <option value="ScrumMaster">Scrum Master</option>
                                         <option value="DigitalMarketing">Digital Marketing</option>
-                                        <option value="Other">Other</option>
+                                        <option value="Other">Other or multiple areas</option>
                                     </select>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="form-group">
-                                    <p>Referral in Makta Community:</p>
-                                    <input type="text" id="joinusreferral" name="joinusreferral" class="form-control">
                                 </div>
                             </div>
 
@@ -122,11 +107,9 @@
         function SubmitJoinUsForm() {
             var name = $('#joinusname').val();
             var email = $('#joinusemail').val();
-            var phone = $('#joinusphone').val();
             var country = $('#country').val();
             var role = $('#joinusrole').val();
             var terms = false;
-            var referral = $('#joinusreferral').val();
 
             if (name === "") {
                 $("#lbljoinusresult").html("* Please enter your name.");
@@ -138,11 +121,6 @@
                 return;
             }
 
-            if (phone === "") {
-                $("#lbljoinusresult").html("* Please enter your phone.");
-                return;
-            }
-
             if ($('#joinusterms').is(":checked")) {
                 terms = true;
             }
@@ -151,7 +129,7 @@
                 return;
             }
 
-            var data = JSON.stringify({ name: name, email: email, phone: phone, terms: terms, country: country, role: role, referral: referral });
+            var data = JSON.stringify({ name: name, email: email, terms: terms, country: country, role: role });
 
             $.ajax({
                 type: "POST",
@@ -160,7 +138,6 @@
                 dataType: "text",
                 success: function (msg) {
                     var res = JSON.parse(msg);
-                    //var res = msg.replace(/"|'/g, '');
                     if (res.isSucceed) {
                         Swal.fire({
                             icon: 'success',
@@ -171,14 +148,12 @@
                         });
                         $('#joinusname').val('');
                         $('#joinusemail').val('');
-                        $('#joinusphone').val('');
                         $('#country').val('NA');
                         $("#country").val("NA").change();
                         $('#joinusrole').val('NA');
                         $("#joinusrole").val("NA").change();
                         $("#joinusterms").prop("checked", false);
                         $('#lbljoinusresult').html('');
-                        $('#joinusreferral').val('');
                     }
                     else
                         Swal.fire({
